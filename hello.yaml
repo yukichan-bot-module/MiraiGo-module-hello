@@ -1,0 +1,12 @@
+blacklist:
+  - 1781924496
+group:
+  msg: "大家好啊，我是 yuki 酱机器人！\n本机器人完全开源，项目地址：https://github.com/yukichan-bot-module。\n如果你喜欢这个机器人请在 GitHub 点一个 Star。\n如果你对机器人感兴趣，欢迎加群 857066811 讨论。"
+  image:
+    - "/opt/yukichan/image/github-page.png"
+    - "/opt/yukichan/image/group-qr-code.png"
+friend:
+  msg: "你好，我是 yuki 酱机器人！\n本机器人完全开源，项目地址：https://github.com/yukichan-bot-module。\n如果你喜欢这个机器人请在 GitHub 点一个 Star。\n如果你对机器人感兴趣，欢迎加群 857066811 讨论。"
+  image:
+    - "/opt/yukichan/image/github-page.png"
+    - "/opt/yukichan/image/group-qr-code.png"
