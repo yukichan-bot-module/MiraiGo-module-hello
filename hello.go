@@ -3,7 +3,9 @@ package hello
 import (
 	"bytes"
 	"io/ioutil"
+	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/Logiase/MiraiGo-Template/bot"
 	"github.com/Logiase/MiraiGo-Template/config"
@@ -22,6 +24,10 @@ type Config struct {
 	BlackList []int64  `yaml:"blacklist"`
 	Group     HelloMsg `yaml:"group"`
 	Friend    HelloMsg `yaml:"friend"`
+	Delay     struct {
+		Enable bool `yaml:"enable"`
+		MaxMin int  `yaml:"max"`
+	} `yaml:"delay"`
 }
 
 var instance *hello
@@ -68,9 +74,11 @@ func (h *hello) Serve(b *bot.Bot) {
 	b.GroupInvitedEvent.Subscribe(func(client *client.QQClient, event *client.GroupInvitedRequest) {
 		logger.Infof("「%s」(%d) 邀请机器人加入群「%s」(%d)。", event.InvitorNick, event.InvitorUin, event.GroupName, event.GroupCode)
 		if inBlacklist(event.InvitorUin) {
+			randomDelay() // 随机等待一会再处理请求
 			event.Reject(true, "您已被列入黑名单")
 			return
 		}
+		randomDelay() // 随机等待一会再处理请求
 		event.Accept()
 		sayHello(client, message.Source{
 			SourceType: message.SourceGroup,
@@ -80,9 +88,11 @@ func (h *hello) Serve(b *bot.Bot) {
 	b.NewFriendRequestEvent.Subscribe(func(client *client.QQClient, event *client.NewFriendRequest) {
 		logger.Infof("「%s」(%d) 请求添加为好友，验证消息为“%s”。", event.RequesterNick, event.RequesterUin, event.Message)
 		if inBlacklist(event.RequesterUin) {
+			randomDelay() // 随机等待一会再处理请求
 			event.Reject()
 			return
 		}
+		randomDelay() // 随机等待一会再处理请求
 		event.Accept()
 		sayHello(client, message.Source{
 			SourceType: message.SourcePrivate,
@@ -151,6 +161,20 @@ func getHelloMsg(c *client.QQClient, target message.Source) *message.SendingMess
 		}
 	}
 	return msg
+}
+
+func randomDelay() {
+	if helloConfig.Delay.Enable {
+		maxMin := helloConfig.Delay.MaxMin
+		// 如果配置文件中未指定，则默认为 30
+		if helloConfig.Delay.MaxMin <= 0 {
+			maxMin = 30
+		}
+		randomMinutes := rand.Intn(maxMin)
+		randomSeconds := rand.Intn(60)
+		time.Sleep(time.Minute * time.Duration(randomMinutes))
+		time.Sleep(time.Second * time.Duration(randomSeconds))
+	}
 }
 
 func inBlacklist(userID int64) bool {
